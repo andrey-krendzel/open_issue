@@ -1,21 +1,43 @@
 const core = require('@actions/core');
-const wait = require('./wait');
+const github = require('@actions/github');
+const { toBeInTheDOM } = require('@testing-library/jest-dom/dist/matchers');
 
+async function run(){
+try {
+    
+    const token = core.getInput('token')
+    const title = core.getInput('title')
+    const body = core.getInput('body')
+    const assignees = core.getInput('assignees');
+   
+    const octokit = new github.Github(token);
 
-// most @actions toolkit packages have async methods
-async function run() {
-  try {
-    const ms = core.getInput('milliseconds');
-    core.info(`Waiting ${ms} milliseconds ...`);
+    const response = await octokit.issues.create({
+        owner: github.context.repo.owner,
+        repo: github.context,repo,repo,
+        ...github.com.repo,
+        title: title,
+        body,
+        assignees
+    });
 
-    core.debug((new Date()).toTimeString()); // debug is only output if you set the secret `ACTIONS_RUNNER_DEBUG` to true
-    await wait(parseInt(ms));
-    core.info((new Date()).toTimeString());
+    octokit.issues.create({
+        //owner,
+        //repo,
+        ...github.context.repo,
+        title,
+        body,
+        assignees: assignees ? assignees.split("\n") : undefined
+    });
 
-    core.setOutput('time', new Date().toTimeString());
-  } catch (error) {
+    core.setOutput("issue", JSON.stringify(response.data));
+    
+} catch (error){
     core.setFailed(error.message);
-  }
+}
 }
 
 run();
+
+
+
